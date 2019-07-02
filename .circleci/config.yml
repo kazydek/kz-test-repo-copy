@@ -1,0 +1,35 @@
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/ruby:2.4.1-node-browsers
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            gem install awesome_bot
+
+      - run:
+          name: run links tests
+          command: |
+            awesome_bot -f another-file.md,test.md,CONTRIBUTING.md,README.md --allow-dupe --allow-redirect --base-url https://github.com/kazydek/kz-test-repo/blob/$CIRCLE_BRANCH/ --white-list http://documentup.com/profile-org-name/repo-name,https://circleci.com/gh/profile-org-name/repo-name,https://circleci.com/gh/profile-org-name/repo-name/tree/master.svg?style=svg
+
+workflows:
+   version: 2
+   commit:
+     jobs:
+       - build
+   nightly:
+     triggers:
+       - schedule:
+           cron: "0 0 * * *"
+           filters:
+             branches:
+               only:
+                 - master
+     jobs:
+       - build
